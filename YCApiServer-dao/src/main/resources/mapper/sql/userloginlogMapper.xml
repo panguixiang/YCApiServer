@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.UserLoginLogMapper">
+	
+	<insert id="saveLoginLog" parameterType="com.yc.music.model.musicuser.UserLoginLog">
+		<![CDATA[  
+		  insert into music_user_login_log(
+			loginip,createdate,uid,loginacc
+           ) 
+		  values(#{loginip},now(),#{uid},#{loginacc})
+		]]>
+	</insert>
+	
+</mapper>

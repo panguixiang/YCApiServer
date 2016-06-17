@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.FocusFansMapper">
+
+    <select id="getFocusStatus" resultType="int">
+		<![CDATA[ 
+			select count(id) from music_focusfans where userid=#{userid} and fansid=#{fansid} and iscancel='false'
+		 ]]>
+	</select>
+	
+	
+	<select id="proFansfocus" statementType="CALLABLE" parameterType="com.yc.music.model.fansfocus.FansOpt">
+		<![CDATA[
+			{call pro_user_fanfocus (
+				#{fansid,mode=IN,jdbcType=INTEGER},
+				#{userid,mode=IN,jdbcType=INTEGER},
+				#{result,mode=OUT,jdbcType=VARCHAR}
+				)
+			}
+		]]>
+	</select>
+	
+	<select id="getMyFansCacheCount" resultType="long">
+		select count(id) from music_focusfans where userid =#{userid}
+	</select>
+	
+	<select id="getFocusCacheCount" resultType="long">
+		select count(id) from music_focusfans where fansid =#{fansid}
+	</select>
+	
+	
+	<select id="getMyFansList" resultType="com.yc.music.model.fansfocus.FansList">
+		<![CDATA[ 
+			SELECT 
+				id,userid,fansid 
+			FROM 
+				music_focusfans 
+			WHERE 
+				userid=#{userid} AND iscancel='false' limit #{start},#{size}
+		 ]]>
+	</select>
+	
+	
+	<select id="getMyFocusList" resultType="com.yc.music.model.fansfocus.FansList">
+		<![CDATA[ 
+			SELECT 
+				id,userid,fansid 
+			FROM 
+				music_focusfans 
+			WHERE 
+				fansid=#{userid} AND iscancel='false' limit #{start},#{size}
+		 ]]>
+	</select>
+	
+	<select id="getFocusIdsByIn" resultType="com.yc.music.model.fansfocus.FansUid">
+		<![CDATA[ 
+			SELECT 
+				userid as uid  
+			FROM 
+				music_focusfans 
+			WHERE 
+				fansid=#{userid} AND userid IN 
+		 ]]>
+			 <foreach item="item" index="index" collection="userIdsArr" open="(" separator="," close=")">
+					#{item} 
+			</foreach>
+		 AND iscancel='false'
+	</select>
+	
+	
+	
+	<select id="getFocusIdsOtherMeByIn" resultType="com.yc.music.model.fansfocus.FansUid">
+		<![CDATA[ 
+			SELECT 
+				fansid as uid  
+			FROM 
+				music_focusfans 
+			WHERE 
+				userid=#{userid} AND fansid IN 
+		 ]]>
+			 <foreach item="item" index="index" collection="userIdsArr" open="(" separator="," close=")">
+					#{item} 
+			</foreach>
+		 AND iscancel='false'
+	</select>
+</mapper>

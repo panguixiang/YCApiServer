@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.WorkFovMapper">
+
+    <select id="getWorkFovCountByUidAndWId" resultType="int">
+		<![CDATA[ 
+			select count(id) from music_fov where workid=#{workid} and uid=#{uid} and type=#{type}
+		 ]]>
+	</select>
+	
+	<select id="getWorkFovCountByTUid" resultType="int">
+		<![CDATA[ 
+			select count(id) from music_fov where target_uid=#{targetuid} and isread=#{isread}
+		 ]]>
+	</select>
+	
+	<update id="setFovIsRead">
+		<![CDATA[ 
+			update music_fov set isread=#{isread} where target_uid=#{uid}
+		]]>
+	</update>
+	
+	<select id="proWorkFov" statementType="CALLABLE" parameterType="com.yc.music.model.OptWork">
+		<![CDATA[
+			{call pro_work_fov (
+				#{work_id,mode=IN,jdbcType=INTEGER},
+				#{target_uid,mode=IN,jdbcType=INTEGER},
+				#{user_id,mode=IN,jdbcType=INTEGER},
+				#{wtype,mode=IN,jdbcType=INTEGER},
+				#{result,mode=OUT,jdbcType=VARCHAR}
+				)
+			}
+		]]>
+	</select>
+	
+	
+	<select id="fovMyCenterList" resultType="com.yc.music.model.musicFov.MyFovCenter">
+	  <![CDATA[
+		SELECT m.id,m.workid as itemid,m.type,m.intabletime,m.uid as user_id,m.target_uid,
+				 m.pic,m.title FROM (
+		   SELECT
+				 a.id,a.workid,a.type,a.intabletime,a.uid,a.target_uid,
+				 b.pic,b.title
+			   FROM  music_fov a,music_work b WHERE a.workid=b.id  AND a.target_uid=#{uid} AND a.type=1
+			 UNION ALL 
+	           SELECT 
+				a.id,a.workid,a.type,a.intabletime,a.uid,a.target_uid,
+				c.pic,c.title
+			   FROM  music_fov a ,music_lyrics c WHERE a.workid=c.id AND a.target_uid=#{uid} AND a.TYPE=2
+	        ) m ORDER BY m.intabletime DESC LIMIT #{start},#{size}
+	 ]]>
+  </select>
+  
+  
+  <select id="userFovCenterList" resultType="com.yc.music.model.musicFov.UserFovCenter">
+	  <![CDATA[
+		SELECT m.* FROM (
+		 ( SELECT
+			 a.id,a.workid as itemid,a.type,a.intabletime,
+			 b.pic,b.title,b.looknum,b.fovnum,b.commentnum,b.uid
+		   FROM  music_fov a,music_work b WHERE a.workid=b.id  AND a.uid=#{uid} AND TYPE=1)
+		 UNION ALL 
+		 ( SELECT 
+			a.id,a.workid as itemid,a.type,a.intabletime,
+			c.pic,c.title,c.looknum,c.fovnum,c.commentnum,c.uid
+		   FROM  music_fov a ,music_lyrics c WHERE a.workid=c.id AND a.uid=#{uid} AND TYPE=2) 
+	   ) m ORDER BY m.intabletime DESC LIMIT #{start},#{size}
+	 ]]>
+  </select>
+  
+</mapper>

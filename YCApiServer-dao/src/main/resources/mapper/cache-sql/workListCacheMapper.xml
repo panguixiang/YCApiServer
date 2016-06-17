@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.WorkListCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getWorkListPage" resultType="com.yc.music.model.musicWorkList.MusicWorkListVo">
+		SELECT 
+			b.id as itemid,b.mp3 as playurl,
+			b.title,b.uid 
+		FROM 
+			music_worklist a LEFT JOIN music_work b ON a.workid=b.id
+ 		WHERE 
+ 			a.gedanid=#{gedanId} AND b.is_issue=#{isUsed} limit #{start},#{size}
+	</select>
+	
+	<select id="getWorkListCount" resultType="int">
+		SELECT 
+			count(a.id)
+		FROM 
+			music_worklist a LEFT JOIN music_work b ON a.workid=b.id
+ 		WHERE 
+ 			a.gedanid=#{gedanId} AND b.is_issue=#{isUsed}
+	</select>
+	
+	<select id="getMusicNext" resultType="map">
+		SELECT workid as id FROM music_worklist WHERE gedanid=#{gedanid} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and workid>#{workid}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and workid<>#{workid}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and workid>#{workid}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="getMusicPrev" resultType="map">
+		SELECT workid as id FROM music_worklist WHERE gedanid=#{gedanid} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and workid<#{workid}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and workid<>#{workid}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and workid<#{workid}]]>
+		</if>
+		limit 1
+	</select>
+	
+</mapper>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.HtmlConfigCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getHtmlConfig" resultType="com.yc.music.model.htmlconfig.HtmlConfig">
+		SELECT id,url FROM html_url_config WHERE type=#{type}
+	</select>
+	
+</mapper>

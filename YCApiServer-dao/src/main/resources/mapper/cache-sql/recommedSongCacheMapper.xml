@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.ReCommedSongCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="recommedSongPage" resultType="com.yc.music.model.musRecomSongs.RecommedSong">
+		select 
+			id,name,pic
+		from 
+			music_recommedsonglist 
+		where 
+			status=#{status} 
+		<if test="isindex!=null">
+			and isindex=#{isindex}
+		</if>
+		order by sequ limit #{start},#{size}
+	</select>
+	
+	<select id="getRecommedSong" resultType="com.yc.music.model.musRecomSongs.RecommedSong">
+		select 
+			id,name,pic,detail 
+		from 
+			music_recommedsonglist 
+		where 
+			id = #{id}
+	</select>
+	
+</mapper>

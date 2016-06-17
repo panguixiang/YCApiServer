@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.WorkCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getWorOpenDetailById" resultType="com.yc.music.model.musicWork.WorkOpenDetail">
+		SELECT 
+			a.id as itemid,a.title,a.pic,a.lyrics,a.mp3 as playurl,a.mp3times,a.uid,
+			a.hotid,a.zannum,a.fovnum,a.commentnum,a.diyids,b.headurl,
+			b.nickname as author,c.author as hotAuthor,c.title as hotTitle,
+			c.mp3times as hotmp3times,c.mp3 as hotmp3
+		FROM 
+			music_work a LEFT JOIN music_user b ON a.uid=b.id 
+				LEFT JOIN music_temp_hot c ON a.hotid=c.id  
+		WHERE 
+			a.id=#{id}
+	</select>
+	
+	<select id="getLookNumCacheById" resultType="com.yc.music.model.NumModel">
+		<![CDATA[
+			select id,looknum as num from music_work where id=#{id}
+		]]>
+	</select>
+	
+	<select id="nextOrderMusic" resultType="map">
+		SELECT id FROM music_work WHERE 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ id>#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ id>#{id}]]>
+		</if>
+		 <![CDATA[ order by ${orderSql}]]>
+		limit 1
+	</select>
+	
+	<select id="prevOrderMusic" resultType="map">
+		SELECT id FROM music_work WHERE 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ id<#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ id<#{id}]]>
+		</if>
+		 <![CDATA[ order by ${orderSql}]]>
+		limit 1
+	</select>
+	
+	
+	<select id="getHomepageMuNext" resultType="map">
+		SELECT id FROM music_work WHERE where uid=#{uid} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and id>#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and id>#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="getHomepageMuPrev" resultType="map">
+		SELECT id FROM music_work WHERE uid=#{uid} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and id<#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and id<#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="nextMusic" resultType="map">
+		SELECT id FROM music_work WHERE 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ id>#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ id>#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="prevMusic" resultType="map">
+		SELECT id FROM music_work WHERE 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ id<#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ id<#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="musicList" resultType="com.yc.music.model.musicWork.MusicWork">
+		<![CDATA[
+			select 
+				a.id as itemid,a.pic,a.title,a.looknum,b.nickname as author 
+			from music_work a left join music_user b on a.uid=b.id
+			]]>
+			<if test="name!=null and name!=''">
+				where a.title like concat(#{name},'%') 
+			</if>
+			<![CDATA[order by a.${ordersql} limit #{start},#{size}]]>
+		
+	</select>
+	
+	<select id="musicVoList" resultType="com.yc.music.model.musicWork.MusicWorkVo">
+		<![CDATA[
+			select 
+				a.id as itemid,a.pic,a.title,a.looknum,a.fovnum,a.zannum,
+				a.intabletime as createDate,b.nickname as author 
+			from music_work a left join music_user b on a.uid=b.id 
+			]]>
+			<if test="name!=null and name!=''">
+				where a.title like concat(#{name},'%') 
+			</if>
+			<![CDATA[order by a.${ordersql} limit #{start},#{size}]]>
+		
+	</select>
+	
+</mapper>

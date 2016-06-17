@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.HotTempCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getHoVoById" resultType="com.yc.music.model.accompaniment.HotVo">
+		SELECT 
+			id,mp3 
+		FROM 
+			music_temp_hot 
+ 		WHERE 
+ 			id=#{id}
+	</select>
+	
+	<select id="redTempHotListPage" resultType="com.yc.music.model.accompaniment.TempHotVo">
+		SELECT 
+			id,title,pic,author,mp3,mp3times
+		FROM 
+			music_temp_hot 
+ 		<if test="name!=null and name!=''">
+ 			where title like concat(#{name},'%') 
+ 		</if>
+ 			order by usenum desc limit #{start},#{size}
+	</select>
+	<!-- 不要合并这两个dao接口，不然redis缓存会频繁刷新 -->
+	<select id="newTempHotListPage" resultType="com.yc.music.model.accompaniment.TempHotVo">
+		SELECT 
+			id,title,pic,author,mp3,mp3times
+		FROM 
+			music_temp_hot 
+ 		<if test="name!=null and name!=''">
+ 			where title like concat(#{name},'%') 
+ 		</if>
+ 			order by createdate desc limit #{start},#{size}
+	</select>
+	
+</mapper>

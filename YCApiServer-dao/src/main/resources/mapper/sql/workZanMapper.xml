@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.WorkZanMapper">
+
+    <select id="getMusicZanCountByUidAndWId" resultType="int">
+		<![CDATA[ 
+			select count(id) from music_work_zan where work_id=#{workid} and user_id=#{uid} and type=#{type}
+		 ]]>
+	</select>
+	
+	
+	<select id="getWorkZanCountByTUid" resultType="int">
+		<![CDATA[ 
+			select count(id) from music_work_zan where target_uid=#{targetuid} and isread=#{isread}
+		 ]]>
+	</select>
+	
+	<update id="setZanIsRead">
+		<![CDATA[ 
+			update music_work_zan set isread=#{isread} where target_uid=#{uid}
+		]]>
+	</update>
+	
+	<select id="proWorkZan" statementType="CALLABLE" parameterType="com.yc.music.model.OptWork">
+		<![CDATA[
+			{call pro_work_zan (
+				#{work_id,mode=IN,jdbcType=INTEGER},
+				#{target_uid,mode=IN,jdbcType=INTEGER},
+				#{user_id,mode=IN,jdbcType=INTEGER},
+				#{wtype,mode=IN,jdbcType=INTEGER},
+				#{result,mode=OUT,jdbcType=VARCHAR}
+				)
+			}
+		]]>
+	</select>
+	
+	<select id="getZanCenterList" resultType="com.yc.music.model.workzan.ZanCenterVo">
+		SELECT m.* FROM (   
+		   SELECT
+				 a.id,a.work_id as itemid,a.type,a.add_time,a.user_id,a.target_uid,
+				 b.pic,b.title
+			   FROM  music_work_zan a,music_work b WHERE a.work_id=b.id  AND a.target_uid=#{uid} AND a.type=1
+			 UNION ALL 
+	           SELECT 
+				a.id,a.work_id as itemid,a.type,a.add_time,a.user_id,a.target_uid,
+				c.pic,c.title
+			   FROM  music_work_zan a ,music_lyrics c WHERE a.work_id=c.id AND a.target_uid=#{uid} AND a.TYPE=2
+	        ) m ORDER BY m.add_time DESC LIMIT #{start},#{size}
+	</select>
+	
+</mapper>

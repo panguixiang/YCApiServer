@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.LyricsCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getLookNumCacheById" resultType="com.yc.music.model.NumModel">
+		<![CDATA[
+			select id,looknum as num from music_lyrics where id=#{id}
+		]]>
+	</select>
+	
+	<select id="lyricsList" resultType="com.yc.music.model.musicLyrics.Lyrics">
+		<![CDATA[
+			select 
+				a.id as itemid,a.pic,a.title,a.looknum,b.nickname as author 
+			from 
+				music_lyrics a left join music_user b
+			on a.uid=b.id 
+		]]>
+			<if test="name!=null and name!=''">
+				where a.title like concat(#{name},'%') 
+			</if>
+			<![CDATA[order by a.${ordersql} limit #{start},#{size}]]>
+		
+	</select>
+	
+	<select id="lyricsRankList" resultType="com.yc.music.model.musicLyrics.LyricsRank">
+		<![CDATA[
+			select 
+				a.id as itemid,a.pic,a.title,a.looknum,a.fovnum,
+				a.zannum,a.updatetime as createDate,b.nickname as author 
+			from 
+				music_lyrics a left join music_user b
+			on a.uid=b.id 
+		]]>
+			<if test="name!=null and name!=''">
+				where a.title like concat(#{name},'%') 
+			</if>
+			<![CDATA[order by a.${ordersql} limit #{start},#{size}]]>
+		
+	</select>
+</mapper>

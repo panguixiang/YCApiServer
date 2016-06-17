@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.MobileCodeLogMapper">
+
+	<insert id="saveCodeLog" parameterType="com.yc.music.model.mobilecode.MobileCodeLog">
+		<![CDATA[  
+		  insert into music_sms_ip_log(ip,createdate) values(#{ip},#{createdate})
+		]]>
+	</insert>
+	
+    <select id="getCountByIpDate" resultType="int">
+		<![CDATA[
+			select 
+				count(id)
+			from 
+				music_sms_ip_log 
+			where 
+				ip=#{ip} and createdate=#{createdate}
+		 ]]>
+	</select>
+	
+	<select id="proSndSMSLog" statementType="CALLABLE" parameterType="com.yc.music.model.mobilecode.SendLogPro">
+		<![CDATA[
+			{call pro_mobile_sendsms_log (
+				#{ip,mode=IN,jdbcType=VARCHAR},
+				#{createdate,mode=IN,jdbcType=VARCHAR},
+				#{mobile,mode=IN,jdbcType=VARCHAR},
+				#{smscode,mode=IN,jdbcType=VARCHAR},
+				#{sendtime,mode=IN,jdbcType=TIMESTAMP},
+				#{smstype,mode=IN,jdbcType=INTEGER}
+				)
+			}
+		]]>
+	</select>
+	
+</mapper>

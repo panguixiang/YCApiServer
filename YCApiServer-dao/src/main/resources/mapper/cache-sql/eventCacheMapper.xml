@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.EventCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getEventList" resultType="com.yc.music.model.musicEvent.MusicEvent">
+		SELECT 
+			id,name,detail,pic,url,begindate,enddate 
+		FROM 
+			music_event 
+ 		WHERE 
+ 		   name like concat(#{name},'%') order by sequ limit #{start},#{size}
+	</select>
+	
+</mapper>

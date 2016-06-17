@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.WorkTuiJianCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="getWorkTuiJian" resultType="com.yc.music.model.musicTuijian.MusicTuiJianVo">
+		<![CDATA[ SELECT 
+			b.itemid,b.status,a.pic,a.title as name,a.uid,a.looknum
+		FROM 
+		 	music_work a,music_tuijian b 
+		WHERE a.id=b.itemid AND b.status=1]]>
+	</select>
+	<select id="getLyicsTuiJian" resultType="com.yc.music.model.musicTuijian.MusicTuiJianVo">
+		<![CDATA[ SELECT 
+			b.itemid,b.status,a.pic,a.title AS name,a.uid,a.looknum 
+		FROM 
+			music_lyrics a,music_tuijian b 
+		WHERE a.id=b.itemid AND b.status=2]]>
+	</select>
+	
+	<select id="getMusicNext" resultType="map">
+		select itemid as id from music_tuijian where 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ itemid>#{itemid}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ itemid<>#{itemid}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ itemid>#{itemid}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="getMusicPrev" resultType="map">
+		select itemid as id from music_tuijian where 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ itemid<#{itemid}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ itemid<>#{itemid}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ itemid<#{itemid}]]>
+		</if>
+		limit 1
+	</select>
+	
+</mapper>

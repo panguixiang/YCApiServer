@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.LyricsCatCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+		<resultMap type="com.yc.music.model.lyricscat.LyricsCat" id="LyricsCatsMap">
+			<id column="id" property="id" />
+			<result column="title" property="title"/>
+			<collection property="libArr" 
+			ofType="com.yc.music.model.lyricscat.LyricsLib"
+			 column="catid">
+			 	<id column="id" property="lid" />
+			 	<result column="lyrics" property="lyrics"  />
+			 </collection>
+		</resultMap>
+		
+	<select id="getLyricsCatList" resultMap="LyricsCatsMap" >
+		SELECT 
+			a.id,b.id AS lid,a.title,b.lyrics 
+		FROM 
+			music_lyrics_cat a LEFT JOIN music_lyrics_lib b 
+		ON a.id=b.catid 
+		 <if test=" keywords!=null and keywords!='' ">
+		  where b.lyrics like concat(#{keywords},'%') 
+		 </if>
+   		ORDER BY b.keynum,b.sortit
+	</select>
+	
+</mapper>

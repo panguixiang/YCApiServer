@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.cache.MusicZanCacheMapper">
+
+	<cache type="com.yc.music.plug.LoggingRedisCache" />
+	
+	<select id="nextMusic" resultType="map">
+		SELECT work_id as id FROM music_work_zan where user_id=#{uid} and type=#{type} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and work_id>#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and work_id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and work_id>#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	<select id="prevMusic" resultType="map">
+		SELECT work_id as id FROM music_work_zan where user_id=#{uid} and type=#{type} 
+		<if test="model==1"><!-- 顺序 -->
+		  <![CDATA[ and work_id<#{id}]]>
+		</if>
+		<if test="model==2"><!-- 随机 -->
+		  <![CDATA[ and work_id<>#{id}]]>
+		</if>
+		<if test="model==null"><!-- 顺序 -->
+		  <![CDATA[ and work_id<#{id}]]>
+		</if>
+		limit 1
+	</select>
+	
+	
+</mapper>

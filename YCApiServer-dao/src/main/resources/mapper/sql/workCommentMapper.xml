@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yc.music.mapper.dao.WorkCommentMapper">
+
+
+	<select id="workCommentList" resultType="com.yc.music.model.comment.YcComment">
+		<![CDATA[
+		SELECT 
+			a.id,a.comment,a.uid,a.workid as itemid,a.target_uid,a.type,
+			a.comment_type,a.createdate,b.headurl,b.nickname,
+			c.headurl as targetheaderurl,c.nickname as target_nickname
+  		FROM 
+  			music_work_comment a LEFT JOIN music_user b ON a.uid=b.id
+ 			LEFT JOIN music_user c ON a.target_uid=c.id  
+ 		WHERE 
+ 			a.workid=#{workid} AND a.type=#{type} ORDER BY a.createdate DESC 
+		LIMIT #{start},#{size}
+		]]>
+	</select>
+	
+	
+	<select id="getNewCommentCountBytuid" resultType="int">
+		<![CDATA[
+			SELECT COUNT(id) FROM music_work_comment WHERE target_uid=#{targetuid} and isread=#{isread}
+		]]>
+	</select>
+	
+	<update id="setCommentIsRead">
+		<![CDATA[ 
+			update music_work_comment set isread=#{isread} where target_uid=#{uid}
+		]]>
+	</update>
+	
+	<insert id="saveWorkComment" parameterType="com.yc.music.model.comment.YcComment" useGeneratedKeys="true" keyProperty="id">
+		<![CDATA[
+			insert into music_work_comment(comment,uid,workid,target_uid,
+			comment_type,isread,type,createdate) 
+			values(#{comment},#{uid},#{itemid},#{target_uid},
+			#{comment_type},#{isread},#{type},now())
+		]]>
+	</insert>
+	
+	
+	<select id="myCommentCenterList" resultType="com.yc.music.model.comment.MyCommentCenter">
+		<![CDATA[
+		SELECT m.* FROM (
+		   SELECT
+				 a.id,a.workid as itemid,a.type,a.createdate,a.uid,a.target_uid,
+				 a.comment_type,a.comment,b.pic,b.title,b.uid as authorid 
+			   FROM  music_work_comment a,music_work b WHERE a.workid=b.id  AND (a.uid=#{uid} OR a.target_uid=#{uid}) AND a.type=1
+			 UNION ALL 
+	           SELECT 
+				a.id,a.workid as itemid,a.type,a.createdate,a.uid,a.target_uid,
+				a.comment_type,a.comment,c.pic,c.title,c.uid as authorid 
+			   FROM  music_work_comment a ,music_lyrics c WHERE a.workid=c.id AND (a.uid=#{uid} OR a.target_uid=#{uid}) AND a.TYPE=2
+	        ) m ORDER BY m.createdate DESC LIMIT #{start},#{size}
+	        ]]>
+	</select>
+	
+	<delete id="deleteById" parameterType="long">
+		delete from music_work_comment where id=#{id}
+	</delete>
+	
+</mapper>
